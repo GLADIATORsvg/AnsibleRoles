@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+    ServerName app.local
+    DocumentRoot /var/www/app/public
+
+    <Directory /var/www/app/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    SetEnv DB_HOST {{ db_host }}
+    SetEnv DB_DATABASE {{ db_name }}
+    SetEnv DB_USERNAME {{ db_user }}
+    SetEnv DB_PASSWORD {{ db_pass }}
+</VirtualHost>
