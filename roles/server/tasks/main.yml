@@ -6,6 +6,11 @@
       - git
       - php
       - php-pgsql
+      - php-xml
+      - php-mbstring
+      - php-zip
+      - unzip
+      - composer
     state: present
     update_cache: yes
 
@@ -14,6 +19,47 @@
     repo: "https://github.com/Practical-DevOps/app-for-devops.git"
     dest: /var/www/app
     version: main
+
+- name: Install Laravel dependencies (composer install)
+  command: composer install
+  args:
+    chdir: /var/www/app
+
+- name: Copy .env example
+  copy:
+    src: /var/www/app/.env.example
+    dest: /var/www/app/.env
+    remote_src: yes
+
+- name: Update Laravel environment variables
+  lineinfile:
+    path: /var/www/app/.env
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}={{ item.value }}"
+  loop:
+    - { key: "DB_HOST", value: "{{ db_host }}" }
+    - { key: "DB_DATABASE", value: "{{ db_name }}" }
+    - { key: "DB_USERNAME", value: "{{ db_user }}" }
+    - { key: "DB_PASSWORD", value: "{{ db_pass }}" }
+
+- name: Generate Laravel key
+  command: php artisan key:generate
+  args:
+    chdir: /var/www/app
+
+- name: Run migrations
+  command: php artisan migrate --force
+  args:
+    chdir: /var/www/app
+
+- name: Fix permissions
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0777'
+  loop:
+    - /var/www/app/storage
+    - /var/www/app/bootstrap/cache
 
 - name: Copy Apache virtual host config
   template:

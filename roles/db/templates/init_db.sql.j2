@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS {{ db_name }};
+
+\c {{ db_name }};
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (
+        SELECT FROM pg_catalog.pg_roles WHERE rolname = '{{ db_user }}'
+    ) THEN
+        CREATE ROLE {{ db_user }} LOGIN PASSWORD '{{ db_pass }}';
+    END IF;
+END
+$$;
+
+GRANT ALL PRIVILEGES ON DATABASE {{ db_name }} TO {{ db_user }};
+
+CREATE TABLE IF NOT EXISTS tasks (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO tasks (title, description)
+VALUES
+('Test Task 1', 'This is a sample task.'),
+('Test Task 2', 'Another example.');
+
