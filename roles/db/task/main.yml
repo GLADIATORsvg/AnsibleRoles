@@ -1,11 +1,12 @@
----
 - name: Install PostgreSQL
   apt:
-    name: postgresql
+    name:
+      - postgresql
+      - postgresql-contrib
     state: present
     update_cache: yes
 
-- name: Ensure PostgreSQL is running
+- name: Ensure PostgreSQL service is running
   systemd:
     name: postgresql
     state: started
@@ -16,9 +17,10 @@
   postgresql_db:
     name: "{{ db_name }}"
 
-- name: Create db user
+- name: Create database user
   become_user: postgres
   postgresql_user:
     name: "{{ db_user }}"
     password: "{{ db_pass }}"
-    priv: "{{ db_name }}:ALL"
+    priv: "ALL"
+    db: "{{ db_name }}"
