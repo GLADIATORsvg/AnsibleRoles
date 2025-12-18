@@ -1,7 +1,7 @@
 ---
 - name: Web Server
   hosts: server
-  become: yes
+  become: true
   vars:
     db_host: "{{ db_host }}"
     db_name: "{{ db_name }}"
@@ -12,7 +12,7 @@
 
 - name: DB Server
   hosts: db
-  become: yes
+  become: true
   vars:
     db_name: "{{ db_name }}"
     db_user: "{{ db_user }}"
